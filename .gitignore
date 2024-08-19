@@ -13,7 +13,57 @@ dist-ssr
 *.local
 
 # Editor directories and files
+.vscode/*# Dependency directories
+node_modules/
+.pnp
+.pnp.js
+
+# Vite cache
+.vite/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build output
+dist/
+dist-ssr/
+out/
+temp/
+*.tmp
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# Editor directories and files
 .vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary files
+*.local
+
+# Typescript
+*.tsbuildinfo
+
+# IntelliJ IDEA
+*.iml
+
 !.vscode/extensions.json
 .idea
 .DS_Store
