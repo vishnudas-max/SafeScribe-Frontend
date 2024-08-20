@@ -6,12 +6,17 @@ import "../assets/style.css";
 import { MdClose } from "react-icons/md";
 import OpenHistoryContext, { HistoryContext } from '../Contexts/OpenHistoryContext';
 import Slider from '@mui/material/Slider';
-
+import { useDispatch, useSelector } from 'react-redux'
+import { setAuth } from '../Redux/AuthSlice'
+import { jwtDecode } from 'jwt-decode';
+import {replace, useInRouterContext, useNavigate} from 'react-router-dom'
 
 
 function Home() {
-
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [value, setValue] = useState(0);
+  const is_authenticated = useSelector(state => state.authInfo.is_authenticated)
   const handlePasswordLength = (e) => {
     setValue(e.target.value);
   };
@@ -39,12 +44,57 @@ function Home() {
   ];
 
   const { isHistoryOpen, toggleHistory } = useContext(HistoryContext);
+
+
+  const onGoogleLoginSuccess = () => {
+    // alert(import.meta.env.VITE_BASE_URL)
+    // // localStorage.setItem('loading', true)
+    const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+    const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URL
+    const scope = [
+      'https://www.googleapis.com/auth/userinfo.email',
+      'https://www.googleapis.com/auth/userinfo.profile'
+    ].join(' ');
+
+    const params = {
+      response_type: 'code',
+      client_id: import.meta.env.VITE_GOOGLE_OAUTH2_CLIENT_ID,
+      redirect_uri: REDIRECT_URI,
+      prompt: 'select_account',
+      access_type: 'offline',
+      scope
+    };
+    const urlParams = new URLSearchParams(params).toString();
+    window.location = `${GOOGLE_AUTH_URL}?${urlParams}`;
+  }
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    const access = query.get('access');
+    const refresh = query.get('refresh');
+    if (access && refresh) {
+      localStorage.setItem('access', access);
+      localStorage.setItem('refresh', refresh);
+      const decodeToken = jwtDecode(access);
+      dispatch(setAuth({
+        "username": decodeToken.username,
+        "is_admin": decodeToken.is_admin,
+        "userID": decodeToken.user_id
+      }));
+    }
+    navigate('/',{replace:true})
+    return () => {
+    }
+  }
+    , [location]
+  )
+
   return (
     <>
       <Navbar change={toggleHistory} />
       <div className='bg-zinc-800 mx-auto  mt-5 md:max-w-[900px] max-w-[350px] h-fit md:pb-7 pb-4'>
         <h1 className='text-center pt-5 md:text-4xl text-2xl font-bold space-x-4 text-white'>Generate a Secure Password</h1>
-
+        {is_authenticated?<h1>hello</h1>:<h1>Login</h1>}
         <div className='pl-5 pr-5 pt-8 pb-4 md:max-w-[700px] max-w-[340px] bg-[#000300] mx-auto md:mt-20 mt-8 rounded-md'>
           <div className='md:flex flex-col md:flex-row gap-x-2 items-center'>
             <input type="text" placeholder='{@}I#},P3+>\\&\\.&' className='bg-gray-800 text-white md:w-72 w-full pt-3 pr-2 pb-1 outline-none rounded-md pl-2 md:text-[19px]' />
@@ -52,9 +102,11 @@ function Home() {
               <button className='flex gap-x-2 h-fit items-center w-fit py-2 bg-[#3aff43] px-2 border rounded-md border-gray-900'>
                 Copy<IoIosCopy className='text-black' />
               </button>
-              <button className='flex gap-x-2 h-fit items-center w-fit py-2 bg-[#3aff43] px-2 border rounded-md border-gray-900'>
+              <button onClick={() => {
+                onGoogleLoginSuccess()
+              }} className='flex gap-x-2 h-fit items-center w-fit py-2 bg-[#3aff43] px-2 border rounded-md border-gray-900'>
                 Save<IoSaveSharp className='text-black' />
-              </button>
+              </button >
             </div>
           </div>
           <div className='w-full h-[1px] my-4 flex gap-x-1'>
@@ -107,17 +159,17 @@ function Home() {
               />
             </div>
             <div className='flex items-center gap-x-3'>
-        <Slider
-          min={0}
-          max={20}
-          value={value}
-          onChange={handlePasswordLength}
-          sx={{
-            width: 300,
-            color: 'success.main',
-          }}
-        />
-      </div>
+              <Slider
+                min={0}
+                max={20}
+                value={value}
+                onChange={handlePasswordLength}
+                sx={{
+                  width: 300,
+                  color: 'success.main',
+                }}
+              />
+            </div>
           </div>
 
           <button className='text-black w-fit h-fit bg-[#3aff43] mt-3 px-3 py-[5px] font-semibold'>Generate</button>

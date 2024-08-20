@@ -2,11 +2,12 @@ import React, { useContext } from 'react'
 import { FaUser } from "react-icons/fa";
 import { BiLogOutCircle } from "react-icons/bi";
 import OpenHistoryContext, { HistoryContext } from '../Contexts/OpenHistoryContext';
-import { MdClose } from 'react-icons/md';
-import { IoIosCopy } from 'react-icons/io';
+import { useDispatch, useSelector } from 'react-redux'
+import { deleteAuth } from '../Redux/AuthSlice'
+
 
 function Navbar({change}) {
-
+    const dispatch = useDispatch()
     const { isHistoryOpen, toggleHistory } = useContext(HistoryContext);
 
     const data = [
@@ -31,7 +32,9 @@ function Navbar({change}) {
         { id: 19, code: '^J1q5&Kl8Fj34sdoD@#', date: '10/08/2025' },
         { id: 20, code: '^KjD4&5fL1$3PkSod@!Ld', date: '15/09/2025' },
       ];
-    
+    const logout=()=>{
+        dispatch(deleteAuth())
+    }
    
 
     return (
@@ -46,7 +49,7 @@ function Navbar({change}) {
                         }} />
                 </div>
                 <div>
-                    <BiLogOutCircle className='md:size-9 size-6 text-red-600' />
+                    <BiLogOutCircle className='md:size-9 size-6 text-red-600' onClick={logout}/>
                 </div>
             </div>
 
