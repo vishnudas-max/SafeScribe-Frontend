@@ -1,14 +1,19 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { FaUser } from "react-icons/fa";
 import { BiLogOutCircle } from "react-icons/bi";
 import OpenHistoryContext, { HistoryContext } from '../Contexts/OpenHistoryContext';
 import { useDispatch, useSelector } from 'react-redux'
 import { deleteAuth } from '../Redux/AuthSlice'
+import CheckAuth from '../assets/CheckAuth';
+import { useNavigate } from 'react-router-dom';
 
 
-function Navbar({change}) {
+function Navbar({change,onGoogleLoginSuccess}) {
     const dispatch = useDispatch()
-    const { isHistoryOpen, toggleHistory } = useContext(HistoryContext);
+    // const { isHistoryOpen, toggleHistory } = useContext(HistoryContext);
+    // const [isLogin,setIsLogin] = useState(false)
+    // const navigate = useNavigate()
+    const is_authenticated = useSelector(state => state.authInfo.is_authenticated)
 
     const data = [
         { id: 1, code: '^fdh&HShh43SKh', date: '12/02/2024' },
@@ -33,15 +38,16 @@ function Navbar({change}) {
         { id: 20, code: '^KjD4&5fL1$3PkSod@!Ld', date: '15/09/2025' },
       ];
     const logout=()=>{
+        localStorage.clear()
         dispatch(deleteAuth())
     }
-   
 
     return (
         <nav className='w-screen grid grid-cols-2  bg-[#000300] h-fit md:py-5 py-2'>
             <div className='col-span-1 h-full md:pl-10 pl-5 flex items-center'>
-                <h1 className='md:text-2xl text-xl font-semibold text-[#097923] space-x-1'><span className='font-bold md:text-3xl text-2xl text-[#3aff43]'>F</span>ind<span className='md:text-3xl text-xl font-bold text-[#3aff43]'>P</span>ass</h1>
+                <h1 className='md:text-2xl text-xl font-semibold text-[#097923] space-x-1'><span className='font-bold md:text-3xl text-2xl text-[#3aff43]'>S</span>afe<span className='md:text-3xl text-xl font-bold text-[#3aff43]'>S</span>cribe</h1>
             </div>
+           {is_authenticated ?
             <div className='col-span-1 h-full flex gap-x-4 items-center justify-end pr-10'>
                 <div className='shrink-0'>
                     <FaUser className='md:size-7 size-5 text-[#3aff43] cursor-pointer' onClick={()=>{
@@ -51,11 +57,16 @@ function Navbar({change}) {
                 <div>
                     <BiLogOutCircle className='md:size-9 size-6 text-red-600' onClick={logout}/>
                 </div>
+            </div>:
+            <div className='col-span-1 h-full flex gap-x-4 items-center justify-end pr-10'>
+            <div className='shrink-0'>
+               <h1 className='text-white cursor-pointer' onClick={onGoogleLoginSuccess}>Login</h1>
             </div>
+        </div>}
 
             
         </nav>
     )
 }
 
-export default OpenHistoryContext(Navbar)
+export default CheckAuth(OpenHistoryContext(Navbar));
